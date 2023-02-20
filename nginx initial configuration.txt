@@ -1,0 +1,82 @@
+Reference: https://phoenixnap.com/kb/how-to-install-nginx-on-ubuntu-20-04#step-1-update-software-repositories
+Installing NGINX in Ubuntu and deploying simple index.html
+
+1. sudo apt-get update				//update
+2. sudo apt-get install nginx		//install nginx
+3. nginx -v							//verify the installation
+4. sudo systemctl status nginx		//checking the status of the Nginx service
+5. sudo systemctl start nginx		//Start
+6. sudo systemctl enable nginx		//enable
+		sudo systemctl stop nginx		//Stop
+		sudo systemctl disable nginx	//disable
+		sudo systemctl reload nginx		//Reload
+		sudo systemctl restart nginx	//Restart
+7. sudo ufw app list				//Nginx needs access through the system’s firewall.
+8. sudo ufw allow 'nginx http'		//To grant nginx access
+		sudo ufw allow 'nginx https'
+		sudo ufw allow 'nginx full'
+9. sudo ufw reload					//To reload after update
+10. http://127.0.0.1				//check in browser that nginx is loading
+
+
+To configure .html file
+
+1. 	sudo apt-get install curl		// If the system does not have a graphical interface, the Nginx Welcome page can be loaded in the terminal using curl
+	curl –i 127.0.0.1	
+	
+2. 	sudo mkdir -p /var/www/test_domain.com/html			//creating a directory in a particular location
+
+3. 	sudo chown –R $USER:$USER /var/www/test_domain.com	//Configure ownership and permission
+	sudo chmod –R 755 /var/www/test_domain.com
+	
+4. 	sudo nano /var/www/test_domain.com/html/index.html	//creating index.html file
+
+5.	adding html data
+		<html>
+		   <head>
+			  <title>Welcome to test_domain.com!</title>
+		   </head>
+		   <body>
+			  <h1>This message confirms that your Nginx server block is working. Great work!</h1>
+		   </body>
+		</html>
+		
+6. 	Create Nginx Server Block Configuration:
+		sudo nano /etc/nginx/sites-available/test_domain.com	//opening conf file for editing
+		
+	Enter the following code according to your configuration:
+		server    {
+		listen 8000;
+		listen [::]:8000;
+		 
+		root /var/www/test_domain.com/html;
+		index index.html index.htm index.nginx.debian.html;
+		 
+		server_name test_domain.com www.test_domain.com;
+		location /          {
+		try_files $uri $uri/ =404;
+			  }
+		}
+
+7. 	Create Symbolic Link for Nginx to Read on Startup:
+		sudo ln –s /etc/nginx/sites-available/test_domain.com /etc/nginx/sites-enabled
+		
+8.  sudo systemctl restart nginx	//to restart nginx
+9.  sudo nginx -t					// test configuration
+10. hostname -i 					//to get ip address of a system
+11. sudo nano /etc/hosts			//to add ip in host
+		127.0.1.1 test_domain.com www.test_domain.com		//add in the previous file last line
+		
+12. www.test_domain.com:8000		//test in the browser if it is a local system
+
+
+Important Nginx File Locations
+By default, Nginx stores different configuration and log files in the following locations:
+
+/var/www/html – Website content as seen by visitors.
+/etc/nginx – Location of the main Nginx application files.
+/etc/nginx/nginx.conf – The main Nginx configuration file.
+/etc/nginx/sites-available – List of all websites configured through Nginx.
+/etc/nginx/sites-enabled – List of websites actively being served by Nginx.
+/var/log/nginx/access.log – Access logs tracking every request to your server.
+/var/log/ngins/error.log – A log of any errors generated in Nginx.
